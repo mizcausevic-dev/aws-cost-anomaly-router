@@ -2,7 +2,7 @@
 
 Operator surface for AWS Cost Anomaly Detection routing, budget breach posture, FinOps ownership clarity, and stop-the-bleed evidence packaging.
 
-- **Live:** [`https://awsfinops.kineticgain.com/`](https://awsfinops.kineticgain.com/) _(pending Hostinger subdomain provisioning)_
+- **Live:** [`https://awsfinops.kineticgain.com/`](https://awsfinops.kineticgain.com/)
 - **Lane:** Multi-Cloud / FinOps · AWS signal
 - **Repo:** [`mizcausevic-dev/aws-cost-anomaly-router`](https://github.com/mizcausevic-dev/aws-cost-anomaly-router)
 
