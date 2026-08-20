@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://awsfinops.kineticgain.com/sitemap.xml
