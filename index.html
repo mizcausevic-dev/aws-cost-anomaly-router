@@ -109,6 +109,16 @@
   footer.site .mono{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
   footer.site a{color:var(--ink-dim);text-decoration:none;border-bottom:1px solid var(--line-soft);transition:color .2s var(--ease),border-color .2s var(--ease)}
   footer.site a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+  .explain-toggle{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:14px 0 2px}
+  .explain-toggle-label{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-right:2px}
+  .explain-chip{font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-dim);cursor:pointer;transition:color .18s var(--ease),border-color .18s var(--ease),background .18s var(--ease)}
+  .explain-chip:hover{color:var(--ink);border-color:var(--cyan)}
+  .explain-chip[aria-pressed="true"]{background:var(--cyan);border-color:var(--cyan);color:var(--ground)}
+  .send-to-llm{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .send-to-llm-label{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-right:2px}
+  .send-to-llm-btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-dim);text-decoration:none;transition:color .18s var(--ease),border-color .18s var(--ease)}
+  .send-to-llm-btn:hover{color:var(--ink);border-color:var(--cyan)}
+  .send-to-llm-icon{width:12px;height:12px;flex-shrink:0;fill:currentColor}
 </style>
 <script type="application/ld+json">
 {
@@ -159,7 +169,15 @@
         <span>Multi-Cloud / FinOps · v1.0-prod · synthetic data only</span>
       </div>
       <h1>AWS Cost Anomaly <span class="grad">Router</span></h1>
-      <p class="hero-sub">Where AWS Cost Anomaly Detection alerts go, what they cost, and who owns the answer. <strong>Read-only operator surface</strong> over the AWS primitives — no production credentials, no actions, no decisions made on your behalf. Built for the conversation that happens <em>before</em> the action.</p>
+      <div class="explain-toggle" role="group" aria-label="Explain this page">
+        <span class="explain-toggle-label">Explain this page:</span>
+        <button type="button" class="explain-chip" data-register="tech" aria-pressed="true">Tech</button>
+        <button type="button" class="explain-chip" data-register="nontech" aria-pressed="false">Non-Tech</button>
+        <button type="button" class="explain-chip" data-register="layman" aria-pressed="false">Layman</button>
+      </div>
+      <p class="hero-sub explain-text" data-register-text="tech">Where AWS Cost Anomaly Detection alerts go, what they cost, and who owns the answer. <strong>Read-only operator surface</strong> over the AWS primitives &mdash; no production credentials, no actions, no decisions made on your behalf. Built for the conversation that happens <em>before</em> the action.</p>
+      <p class="hero-sub explain-text" data-register-text="nontech" hidden>When AWS flags a cost spike, this page shows which team owns it, how much it is likely to cost if nobody reacts, and whether anyone has acknowledged it yet. It only reads AWS billing and anomaly data &mdash; it cannot change anything in your account.</p>
+      <p class="hero-sub explain-text" data-register-text="layman" hidden>Think of this as a dashboard that watches for surprise AWS bills, tells you who is responsible for fixing them, and how urgent each one is &mdash; without being able to touch your actual AWS account.</p>
       <div class="stats" id="posture">
         <div class="stat">
           <span class="stat-num ok">11</span>
@@ -260,17 +278,33 @@
       <div class="mono">Synthetic data · No production credentials · No write-path</div>
     </div>
     <div class="row" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft)">
-      <div class="mono" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <span style="color:var(--ink-faint)">SEND TO:</span>
-        <a class="pill neutral" href="https://chatgpt.com/?q=Please%20explain%20and%20summarize%20the%20key%20takeaways%20of%20this%20page%3A%20https%3A%2F%2Fawsfinops.kineticgain.com%2F" target="_blank" rel="noopener">ChatGPT</a>
-        <a class="pill neutral" href="https://claude.ai/new?q=Please%20explain%20and%20summarize%20the%20key%20takeaways%20of%20this%20page%3A%20https%3A%2F%2Fawsfinops.kineticgain.com%2F" target="_blank" rel="noopener">Claude</a>
-        <a class="pill neutral" href="https://www.perplexity.ai/search?q=Please%20explain%20and%20summarize%20the%20key%20takeaways%20of%20this%20page%3A%20https%3A%2F%2Fawsfinops.kineticgain.com%2F" target="_blank" rel="noopener">Perplexity</a>
-        <a class="pill neutral" href="https://gemini.google.com/app?text=Please%20explain%20and%20summarize%20the%20key%20takeaways%20of%20this%20page%3A%20https%3A%2F%2Fawsfinops.kineticgain.com%2F" target="_blank" rel="noopener">Gemini</a>
-      </div>
+      <div class="send-to-llm" data-prompt="Please explain and summarize the key takeaways of this page:"></div>
       <div class="mono">&copy; 2026 KINETIC GAIN LLC &middot; SIGNED &middot; ED25519</div>
     </div>
   </div>
 </footer>
 
+<script>
+(function(){
+  var KEY='kg-explain-register';
+  var chips=[].slice.call(document.querySelectorAll('.explain-chip'));
+  var texts=[].slice.call(document.querySelectorAll('.explain-text'));
+  if(!chips.length||!texts.length) return;
+  function apply(reg){
+    texts.forEach(function(el){ el.hidden = el.getAttribute('data-register-text')!==reg; });
+    chips.forEach(function(c){ c.setAttribute('aria-pressed', c.getAttribute('data-register')===reg ? 'true':'false'); });
+  }
+  var saved=null; try{ saved=localStorage.getItem(KEY); }catch(e){}
+  if(saved && texts.some(function(el){return el.getAttribute('data-register-text')===saved;})) apply(saved);
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      var reg=c.getAttribute('data-register')||'tech';
+      apply(reg);
+      try{ localStorage.setItem(KEY,reg); }catch(e){}
+    });
+  });
+})();
+</script>
+<script src="https://kineticgain.com/js/send-to-llm.js" defer></script>
 </body>
 </html>
